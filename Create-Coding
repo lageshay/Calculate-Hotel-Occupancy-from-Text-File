@@ -1,0 +1,61 @@
+#opens file 'Test Hotel' for python to read, file is saved to the same directory (folder) as this code
+file_object=open("Test Hotel.csv", "r")
+
+#headers creates an empty string to hold the file headers
+headers = ""
+#table creates an empty list to hold the non-header data set in the file
+table = []
+#output is a list of strings where each string is one line in the file
+output=file_object.readlines()
+
+#Loop runs through each element for the length of the output list
+for i in range(len(output)):
+    #if running the first line, set headers to equal this string
+    if i == 0:
+        headers = output[i].strip()
+    #if running after the first line, strip the new line character, split the element by ',' and add the string to table
+    elif i > 0:
+        table.append(output[i].strip().split(','))
+
+#new_table creates an empty list to hold the final set of float numbers after conversion
+new_table = []
+#run through each row of the original 'table' for the length of table
+for j in range(len(table)):
+    #other_table creates an empty list to hold the set of float numbers after conversion
+    other_table= []
+    #run through each column of each row for the length of table
+    for k in range(len(table[j])):
+        #when running through table, convert the elements to float and add then to other_table
+        other_table.append(float(table[j][k]))
+    #calculate available rooms: subtracts the second number from the first in each list and adds the result to the end of each list
+    other_table.append(other_table[0]-other_table[1])
+    #calculate gross occupancy: divides the 3rd number by the first in each list and adds the result to the end of each list
+    other_table.append(other_table[2]/other_table[0])
+    #calculate net occupancy: divides the 3rd number by the 4th in each list and adds the result to the end of each list
+    other_table.append(other_table[2]/other_table[3])
+    #Add to the list in new_table for each iteration of other_table
+    new_table.append(other_table)
+
+#creates a new file for data to export in with writing permissions
+new_file= open("Occupancy Report.csv","w+")
+
+#writes the original and added headers strings to the written file
+new_headers= headers + ", Available Rooms, Gross Occupancy, Net Occupancy"
+new_file.write(new_headers)
+new_file.write("\n")
+
+#runs through a loop to convert each list in 'new_table' to a string and write it in the 'Occupancy Report' file
+for m in range(len(new_table)):
+    #Makes column 4 and 5 equal to themselves times 100 and adds (concatenates) a '%'
+    new_table[m][4]= str(new_table[m][4]*100) + "%"
+    new_table[m][5]= str(new_table[m][5]*100) + "%"
+    #converts new_table to strings, removes the list brackets ([1:-1]), and removes the ' feature created in columns 4 and 5 by the str conversion above
+    new_file.write(str(new_table[m])[1:-1].replace("'", ""))
+    #Adds the new character line so each iteration starts on a new Excel row
+    new_file.write("\n")
+    
+#closes the file from python/shell so the file can be opened on the dekstop
+new_file.close()
+
+#prints the new-table lists in the Shell to easily confirm that the process ran correctly and completely
+print(new_table)
